@@ -1,6 +1,6 @@
 export default class Item {
     constructor(
-        readonly id: number,
+        readonly idItem: number,
         readonly category: string,
         readonly description: string,
         readonly price: number,
@@ -9,7 +9,7 @@ export default class Item {
         readonly length: number = 0,
         readonly weight: number = 0
     ) {
-        this.id = id;
+        this.idItem = idItem;
         this.category = category;
         this.price = price;
     }

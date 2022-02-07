@@ -23,7 +23,7 @@ export default class Order {
 
     addItem(item: Item, quantity: number) {
         this.freight += this.freightCalculator.calculate(item) * quantity;
-        this.orderItems.push(new OrderItem(item.id, item.price, quantity));
+        this.orderItems.push(new OrderItem(item.idItem, item.price, quantity));
     }
 
     getTotal(): number {
@@ -34,6 +34,7 @@ export default class Order {
         if (this.coupon && this.coupon.isValid()) {
             total -= this.coupon.calculateDiscount(total);
         }
+        total += this.getFreight();
         return total;
     }
 
