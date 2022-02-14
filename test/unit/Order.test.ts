@@ -6,7 +6,7 @@ import FixedFreightCalculator from "../../src/domain/entity/FixedFreightCalculat
 
 describe("Order", () => {
     beforeAll(() => {
-        jest.useFakeTimers().setSystemTime(new Date("2022-01-01").getTime());
+        jest.useFakeTimers().setSystemTime(new Date("2022-01-02").getTime());
     });
 
     it("Deve criar um pedido vazio", function () {
@@ -119,5 +119,40 @@ describe("Order", () => {
         );
         const freight = order.getFreight();
         expect(freight).toBe(50);
+    });
+    test("Deve criar um pedido com código", function () {
+        const cpf = "839.435.452-10";
+        const order = new Order(cpf, new Date(), new FixedFreightCalculator());
+        order.addItem(
+            new Item(
+                4,
+                "Instrumentos musicais",
+                "Guitarra",
+                1000,
+                100,
+                30,
+                10,
+                3
+            ),
+            1
+        );
+        order.addItem(
+            new Item(
+                5,
+                "Instrumentos musicais",
+                "amplificador",
+                5000,
+                100,
+                50,
+                50,
+                20
+            ),
+            1
+        );
+        order.addItem(
+            new Item(6, "Acessorios", "Cabo", 30, 10, 10, 10, 0.9),
+            3
+        );
+        expect(order.getCode()).toBe("202200000001");
     });
 });

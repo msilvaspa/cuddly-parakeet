@@ -1,3 +1,4 @@
+import DefaultFreightCalculator from "../../domain/entity/DefaultFreightCalculator";
 import Order from "../../domain/entity/Order";
 import CouponRepository from "../../domain/repository/CouponRepository";
 import ItemRepository from "../../domain/repository/ItemRepository";
@@ -13,7 +14,13 @@ export default class PlaceOrder {
     ) {}
 
     async execute(input: PlaceOrderInput): Promise<PlaceOrderOutput> {
-        const order = new Order(input.cpf, input.date);
+        const sequence = (await this.orderRepository.count()) + 1;
+        const order = new Order(
+            input.cpf,
+            input.date,
+            new DefaultFreightCalculator(),
+            sequence
+        );
 
         for (const orderItem of input.orderItems) {
             const item = await this.itemRepository.findById(orderItem.idItem);
@@ -26,7 +33,6 @@ export default class PlaceOrder {
         }
         await this.orderRepository.save(order);
         const total = order.getTotal();
-        const output = new PlaceOrderOutput(total);
-        return output;
+        return new PlaceOrderOutput(order.getCode(), total);
     }
 }

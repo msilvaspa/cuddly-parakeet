@@ -1,18 +1,31 @@
 import PlaceOrder from "../../src/application/usecase/PlaceOrder";
-import CouponRepositoryMemory from "../../src/infra/repository/memory/CouponRepositoryMemory";
-import ItemRepositoryMemory from "../../src/infra/repository/memory/ItemRepositoryMemory";
-import OrderRepositoryMemory from "../../src/infra/repository/memory/OrderRepositoryMemory";
+import CouponRepositoryDatabase from "../../src/infra/repository/database/CouponRepositoryDatabase";
+import OrderRepositoryDatabase from "../../src/infra/repository/database/OrderRepositoryDatabase";
+import ItemRepositoryDatabase from "../../src/infra/repository/database/ItemRepositoryDatabase";
+import PgPromiseConnectionAdapter from "../../src/infra/database/PgPromiseConnectionAdapter";
+import OrderRepository from "../../src/domain/repository/OrderRepository";
 
 describe("PlaceOrder", () => {
-    it("Deve fazer um pedido", async function () {
-        const itemRepository = new ItemRepositoryMemory();
-        const orderRepository = new OrderRepositoryMemory();
-        const couponRepository = new CouponRepositoryMemory();
-        const placeOrder = new PlaceOrder(
+    let placeOrder: PlaceOrder;
+    let orderRepository: OrderRepository;
+
+    beforeEach(() => {
+        const connection = new PgPromiseConnectionAdapter();
+        const itemRepository = new ItemRepositoryDatabase(connection);
+        orderRepository = new OrderRepositoryDatabase(connection);
+        const couponRepository = new CouponRepositoryDatabase(connection);
+        placeOrder = new PlaceOrder(
             itemRepository,
             orderRepository,
             couponRepository
         );
+    });
+
+    afterEach(async () => {
+        await orderRepository.clear();
+    });
+
+    it("Deve fazer um pedido", async function () {
         const input = {
             cpf: "839.435.452-10",
             orderItems: [
@@ -24,18 +37,10 @@ describe("PlaceOrder", () => {
             coupon: "VALE20",
         };
         const output = await placeOrder.execute(input);
-        expect(output.total).toBe(88);
+        expect(output.total).toBe(138);
     });
 
     it("Deve fazer um pedido com cálculo de frete", async function () {
-        const itemRepository = new ItemRepositoryMemory();
-        const orderRepository = new OrderRepositoryMemory();
-        const couponRepository = new CouponRepositoryMemory();
-        const placeOrder = new PlaceOrder(
-            itemRepository,
-            orderRepository,
-            couponRepository
-        );
         const input = {
             cpf: "839.435.452-10",
             orderItems: [
@@ -50,19 +55,25 @@ describe("PlaceOrder", () => {
     });
 
     it("Deve dar erro caso item nao exista", async function () {
-        const itemRepository = new ItemRepositoryMemory();
-        const orderRepository = new OrderRepositoryMemory();
-        const couponRepository = new CouponRepositoryMemory();
-        const placeOrder = new PlaceOrder(
-            itemRepository,
-            orderRepository,
-            couponRepository
-        );
         const input = {
             cpf: "839.435.452-10",
             orderItems: [{ idItem: 7, quantity: 1 }],
             date: new Date("2021-12-10"),
         };
         await expect(placeOrder.execute(input)).rejects.toThrow();
+    });
+
+    it("Deve fazer um pedido com código", async function () {
+        const input = {
+            cpf: "839.435.452-10",
+            orderItems: [
+                { idItem: 4, quantity: 1 },
+                { idItem: 5, quantity: 1 },
+                { idItem: 6, quantity: 3 },
+            ],
+            date: new Date("2021-12-10"),
+        };
+        const output = await placeOrder.execute(input);
+        expect(output.code).toBe("202100000001");
     });
 });
