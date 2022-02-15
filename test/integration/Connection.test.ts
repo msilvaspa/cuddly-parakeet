@@ -3,10 +3,8 @@ import PgPromiseConnectionAdapter from "../../src/infra/database/PgPromiseConnec
 
 describe("Connection", () => {
     it("should connect to the database", async () => {
-        const connection = new PgPromiseConnectionAdapter();
+        const connection = PgPromiseConnectionAdapter.getInstance();
         const items = await connection.query("SELECT * FROM ccca.item", []);
-        console.log(items);
-
         expect(items).toHaveLength(6);
     });
 });
