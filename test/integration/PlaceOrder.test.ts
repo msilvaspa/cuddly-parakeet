@@ -1,9 +1,9 @@
 import PlaceOrder from "../../src/application/usecase/place_order/PlaceOrder";
-import CouponRepositoryDatabase from "../../src/infra/repository/database/CouponRepositoryDatabase";
 import OrderRepositoryDatabase from "../../src/infra/repository/database/OrderRepositoryDatabase";
-import ItemRepositoryDatabase from "../../src/infra/repository/database/ItemRepositoryDatabase";
 import PgPromiseConnectionAdapter from "../../src/infra/database/PgPromiseConnectionAdapter";
 import OrderRepository from "../../src/domain/repository/OrderRepository";
+import DatabaseRepositoryFactory from "../../src/infra/factory/DatabaseRepositoryFactory";
+import MemoryRepositoryFactory from "../../src/infra/factory/MemoryRepositoryFactory";
 
 describe("PlaceOrder", () => {
     let placeOrder: PlaceOrder;
@@ -11,14 +11,10 @@ describe("PlaceOrder", () => {
 
     beforeEach(() => {
         const connection = PgPromiseConnectionAdapter.getInstance();
-        const itemRepository = new ItemRepositoryDatabase(connection);
         orderRepository = new OrderRepositoryDatabase(connection);
-        const couponRepository = new CouponRepositoryDatabase(connection);
-        placeOrder = new PlaceOrder(
-            itemRepository,
-            orderRepository,
-            couponRepository
-        );
+        const repositoryFactory = new DatabaseRepositoryFactory();
+        // const repositoryFactory = new MemoryRepositoryFactory();
+        placeOrder = new PlaceOrder(repositoryFactory);
     });
 
     afterEach(async () => {
