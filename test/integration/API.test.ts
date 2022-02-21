@@ -1,6 +1,6 @@
 import axios from "axios";
 
-describe("API", () => {
+describe.skip("API", () => {
     it("deve testar a API /oders POST", async () => {
         const response = await axios({
             url: "http://localhost:3000/orders",

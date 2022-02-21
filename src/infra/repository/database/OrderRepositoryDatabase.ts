@@ -38,6 +38,14 @@ export default class OrderRepositoryDatabase implements OrderRepository {
         return orderData.count;
     }
 
+    async get(id: number): Promise<Order | undefined> {
+        const [orderData] = await this.connection.query(
+            "select * from ccca.order where code = $1",
+            [id]
+        );
+        return orderData.count;
+    }
+
     async clear(): Promise<void> {
         await this.connection.query("delete from ccca.order_item", []);
         await this.connection.query("delete from ccca.order", []);
