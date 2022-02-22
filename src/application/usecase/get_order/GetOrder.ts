@@ -10,7 +10,6 @@ export default class GetOrder {
 
     async execute(code: string): Promise<GetOrderOutput> {
         const order = await this.orderRepository.get(code);
-        if (!order) throw new Error("Order not found");
-        return order;
+        return new GetOrderOutput(order.getCode(), order.getTotal());
     }
 }

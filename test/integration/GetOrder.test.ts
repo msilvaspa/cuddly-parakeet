@@ -14,8 +14,8 @@ describe("PlaceOrder", () => {
     beforeEach(() => {
         const connection = PgPromiseConnectionAdapter.getInstance();
         orderRepository = new OrderRepositoryDatabase(connection);
-        const repositoryFactory = new DatabaseRepositoryFactory();
-        // const repositoryFactory = new MemoryRepositoryFactory();
+        // const repositoryFactory = new DatabaseRepositoryFactory();
+        const repositoryFactory = new MemoryRepositoryFactory();
         placeOrder = new PlaceOrder(repositoryFactory);
         getOrder = new GetOrder(repositoryFactory);
     });
