@@ -5,4 +5,5 @@ export default interface OrderRepository {
     count(): Promise<number>;
     clear(): Promise<void>;
     get(id: string): Promise<Order>;
+    findAll(): Promise<Order[]>;
 }

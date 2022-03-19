@@ -1,6 +1,7 @@
-import DefaultFreightCalculator from "../../domain/entity/DefaultFreightCalculator";
 import FreightCalculator from "../../domain/entity/FreightCalculator";
 import RepositoryFactory from "../../domain/factory/RepositoryFactory";
+import GetOrderController from "../controller/GetOrderController";
+import GetOrdersController from "../controller/GetOrdersController";
 import PlaceOrderController from "../controller/PlaceOrderController";
 import SimulateFreightController from "../controller/SimulateFreightController";
 import Http from "./Http";
@@ -29,5 +30,19 @@ export default class RouteConfig {
                 return simulateFreightController.execute(params, body);
             }
         );
+
+        http.on("/orders", "get", async function () {
+            const getOrdersController = new GetOrdersController(
+                repositoryFactory
+            );
+            return getOrdersController.execute();
+        });
+
+        http.on("/orders/:code", "get", async function (params: any) {
+            const getOrderController = new GetOrderController(
+                repositoryFactory
+            );
+            return getOrderController.execute(params.code);
+        });
     }
 }

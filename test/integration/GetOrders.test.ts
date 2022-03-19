@@ -1,4 +1,4 @@
-import GetOrder from "../../src/application/usecase/get_order/GetOrder";
+import GetOrders from "../../src/application/usecase/get_orders/GetOrders";
 import PlaceOrder from "../../src/application/usecase/place_order/PlaceOrder";
 import PgPromiseConnectionAdapter from "../../src/infra/database/PgPromiseConnectionAdapter";
 import DatabaseRepositoryFactory from "../../src/infra/factory/DatabaseRepositoryFactory";
@@ -6,7 +6,7 @@ import OrderRepositoryDatabase from "../../src/infra/repository/database/OrderRe
 
 describe("PlaceOrder", () => {
     let placeOrder: PlaceOrder;
-    let getOrder: GetOrder;
+    let getOrders: GetOrders;
     let orderRepository: OrderRepositoryDatabase;
 
     beforeEach(function () {
@@ -14,10 +14,10 @@ describe("PlaceOrder", () => {
         orderRepository = new OrderRepositoryDatabase(connection);
         const repositoryFactory = new DatabaseRepositoryFactory();
         placeOrder = new PlaceOrder(repositoryFactory);
-        getOrder = new GetOrder(repositoryFactory);
+        getOrders = new GetOrders(repositoryFactory);
     });
 
-    test("Deve obter um pedido pelo código", async function () {
+    test("Deve obter todos os pedidos", async function () {
         const input = {
             cpf: "839.435.452-10",
             orderItems: [
@@ -28,10 +28,9 @@ describe("PlaceOrder", () => {
             date: new Date("2021-12-10"),
             coupon: "VALE20",
         };
-        const placeOrderOutput = await placeOrder.execute(input);
-        const getOrderOutput = await getOrder.execute(placeOrderOutput.code);
-        expect(getOrderOutput.code).toBe("202100000001");
-        expect(getOrderOutput.total).toBe(138);
+        await placeOrder.execute(input);
+        const getOrdersOutput = await getOrders.execute();
+        expect(getOrdersOutput.orders).toHaveLength(1);
     });
 
     afterEach(async function () {
